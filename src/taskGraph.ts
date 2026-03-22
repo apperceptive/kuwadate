@@ -14,13 +14,10 @@ export interface TaskNode {
     children: TaskNode[];
 }
 
-/** Check if a file is a kuwadate task by looking for the kuwadate tag. */
+/** Check if a file is a kuwadate task by looking for the kuwadate property. */
 export function isKuwadateTask(meta: CachedMetadata | null): boolean {
     if (!meta?.frontmatter) return false;
-    const tags = meta.frontmatter.tags;
-    if (Array.isArray(tags)) return tags.includes('kuwadate');
-    if (typeof tags === 'string') return tags === 'kuwadate';
-    return false;
+    return meta.frontmatter.kuwadate != null;
 }
 
 /** Extract the display name from a wikilink value like "[[Some Page]]" or "Some Page". */

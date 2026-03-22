@@ -3,8 +3,7 @@ import { KUWADATE_FOLDER } from './bootstrap';
 import { KuwadateSettings } from './settings';
 
 const TASK_TEMPLATE = `---
-tags:
-  - kuwadate
+kuwadate: 1
 type: task
 status: todo
 priority:
@@ -39,26 +38,31 @@ created: "DATE_PLACEHOLDER"
 export interface NewTaskOptions {
     name: string;
     parent?: string | null;
+    currentFolder?: string;
 }
 
 /** Resolve the folder path for new tasks based on settings. */
-function getTaskFolder(app: App, settings: KuwadateSettings): string {
+function getTaskFolder(settings: KuwadateSettings, currentFolder?: string): string {
     switch (settings.taskFolder) {
         case 'kuwadate':
             return KUWADATE_FOLDER;
         case 'custom':
             return settings.customFolder || '';
         case 'current':
-        default: {
-            const activeFile = app.workspace.getActiveFile();
-            if (activeFile) {
-                const parts = activeFile.path.split('/');
-                parts.pop(); // remove filename
-                return parts.join('/');
-            }
-            return '';
-        }
+        default:
+            return currentFolder || '';
     }
+}
+
+/** Get the folder of a file. */
+export function getFolderOf(app: App): string {
+    const activeFile = app.workspace.getActiveFile();
+    if (activeFile) {
+        const parts = activeFile.path.split('/');
+        parts.pop();
+        return parts.join('/');
+    }
+    return '';
 }
 
 export async function createTask(app: App, options: NewTaskOptions, settings: KuwadateSettings): Promise<TFile> {
@@ -69,7 +73,7 @@ export async function createTask(app: App, options: NewTaskOptions, settings: Ku
         .replace('PARENT_PLACEHOLDER', parentValue)
         .replace('DATE_PLACEHOLDER', today);
 
-    const folder = getTaskFolder(app, settings);
+    const folder = getTaskFolder(settings, options.currentFolder);
     const prefix = folder ? `${folder}/` : '';
     const path = normalizePath(`${prefix}${options.name}.md`);
 
@@ -94,7 +98,7 @@ export async function adaptNote(app: App, file: TFile): Promise<void> {
     const hasFrontmatter = content.startsWith('---');
 
     const kuwadateProperties = [
-        'tags:\n  - kuwadate',
+        'kuwadate: 1',
         'type: task',
         'status: todo',
         'priority:',
@@ -107,6 +111,7 @@ export async function adaptNote(app: App, file: TFile): Promise<void> {
         'owner:',
         'collaborators:\n  -',
         'cover:',
+        'cost:',
         `created: "${today}"`,
     ];
 
@@ -130,8 +135,8 @@ export async function adaptNote(app: App, file: TFile): Promise<void> {
     }
 
     // Append subtasks embed if not present
-    if (!newContent.includes('Kuwadate.base#Children')) {
-        newContent = newContent.trimEnd() + '\n\n## Subtasks\n![[Kuwadate.base#Children]]\n';
+    if (!newContent.includes('Kuwadate Descendants.base#Children')) {
+        newContent = newContent.trimEnd() + '\n\n## Subtasks\n![[Kuwadate Descendants.base#Children]]\n\n## Other Tasks\n![[Kuwadate.base#Ancestors]]\n';
     }
 
     await app.vault.modify(file, newContent);

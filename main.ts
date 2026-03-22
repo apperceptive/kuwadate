@@ -59,6 +59,10 @@ export default class KuwadatePlugin extends Plugin {
 
                         const fm = meta.frontmatter!;
 
+                        // Auto-fill: if a note has the kuwadate property but is missing
+                        // standard fields, fill them in (e.g. created via Base + button)
+                        await this.autoFillKuwadateNote(file, fm);
+
                         // If task was just marked done, propagate to dependents
                         if (fm.status === 'done') {
                             await propagateCompletion(this.app, file);
@@ -87,6 +91,49 @@ export default class KuwadatePlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    /** Auto-fill missing kuwadate fields on notes created via Base + button. */
+    private async autoFillKuwadateNote(file: TFile, fm: Record<string, unknown>) {
+        let needsUpdate = false;
+
+        // Check if parent is raw text (not a wikilink) and convert it
+        const parentVal = fm.parent;
+        const hasRawParent = parentVal && typeof parentVal === 'string'
+            && !String(parentVal).startsWith('[[');
+
+        // Check if essential fields are missing
+        const missingStatus = fm.status === undefined || fm.status === null;
+        const missingType = fm.type === undefined || fm.type === null;
+        const missingCreated = fm.created === undefined || fm.created === null;
+
+        if (hasRawParent || missingStatus || missingType || missingCreated) {
+            needsUpdate = true;
+        }
+
+        if (!needsUpdate) return;
+
+        await this.app.fileManager.processFrontMatter(file, (fmData) => {
+            // Convert raw parent text to wikilink
+            if (fmData.parent && typeof fmData.parent === 'string'
+                && !fmData.parent.startsWith('[[')) {
+                fmData.parent = `[[${fmData.parent}]]`;
+            }
+
+            // Fill in missing standard fields
+            if (fmData.status === undefined || fmData.status === null) fmData.status = 'todo';
+            if (fmData.type === undefined || fmData.type === null) fmData.type = 'task';
+            if (fmData.created === undefined || fmData.created === null) {
+                fmData.created = new Date().toISOString().slice(0, 10);
+            }
+        });
+
+        // Append body sections if the note is mostly empty
+        const content = await this.app.vault.read(file);
+        if (!content.includes('## Description')) {
+            const body = '\n\n## Description\n\n\n## Notes\n\n\n## Subtasks\n![[Kuwadate Descendants.base#Children]]\n\n## Other Tasks\n![[Kuwadate.base#Ancestors]]\n';
+            await this.app.vault.modify(file, content.trimEnd() + body);
+        }
     }
 
     private async activateTreeView() {

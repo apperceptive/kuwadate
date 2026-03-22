@@ -44,7 +44,7 @@ Each task is its own page, tagged \`kuwadate\`, with properties for status, prio
 
 const BASE_FILE = `filters:
   and:
-    - file.hasTag("kuwadate")
+    - note.kuwadate == 1
 properties:
   status:
     displayName: Status
@@ -114,7 +114,7 @@ views:
 
 const DESCENDANTS_BASE_FILE = `filters:
   and:
-    - file.hasTag("kuwadate")
+    - note.kuwadate == 1
     - or:
         - parent == this.file.name
         - parent.asFile().properties.parent == this.file.name
@@ -132,11 +132,14 @@ properties:
     displayName: Parent
   due:
     displayName: Due
+  cost:
+    displayName: Cost
 views:
   - type: table
     name: Children
     filters:
       and:
+        - note.kuwadate == 1
         - parent == this.file.name
     order:
       - file.name
@@ -144,7 +147,7 @@ views:
       - urgency
       - priority
       - due
-      - parent.path
+      - cost
     sort:
       - property: priority
         direction: ASC
@@ -176,7 +179,7 @@ views:
       - priority
       - urgency
       - due
-      - parent.path
+      - cost
     sort:
       - property: priority
         direction: ASC
@@ -192,7 +195,6 @@ views:
       - priority
       - urgency
       - due
-      - parent.path
     sort:
       - property: priority
         direction: ASC
@@ -224,8 +226,7 @@ views:
 `;
 
 const TASK_TEMPLATE_CONTENT = `---
-tags:
-  - kuwadate
+kuwadate: 1
 type: task
 status: todo
 priority:

@@ -1,6 +1,6 @@
 import { Plugin, TFile } from 'obsidian';
 import { NewTaskModal } from './modals';
-import { createTask, adaptNote } from './taskCreation';
+import { createTask, adaptNote, getFolderOf } from './taskCreation';
 import { isKuwadateTask, buildTaskGraph } from './taskGraph';
 import { KuwadateSettings } from './settings';
 
@@ -9,8 +9,12 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
         id: 'new-task',
         name: 'New task',
         callback: () => {
+            const currentFolder = getFolderOf(plugin.app);
             new NewTaskModal(plugin.app, async (result) => {
-                const file = await createTask(plugin.app, result, getSettings());
+                const file = await createTask(plugin.app, {
+                    ...result,
+                    currentFolder,
+                }, getSettings());
                 await plugin.app.workspace.getLeaf().openFile(file);
             }).open();
         },
@@ -26,10 +30,12 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
             if (!isKuwadateTask(meta)) return false;
             if (checking) return true;
 
+            const currentFolder = getFolderOf(plugin.app);
             new NewTaskModal(plugin.app, async (result) => {
                 const file = await createTask(plugin.app, {
                     name: result.name,
                     parent: activeFile.basename,
+                    currentFolder,
                 }, getSettings());
                 await plugin.app.workspace.getLeaf().openFile(file);
             }, activeFile.basename).open();
@@ -46,11 +52,13 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
             if (!isKuwadateTask(meta)) return false;
             if (checking) return true;
 
+            const currentFolder = getFolderOf(plugin.app);
             const parentName = resolveParentFromMeta(meta);
             new NewTaskModal(plugin.app, async (result) => {
                 const file = await createTask(plugin.app, {
                     name: result.name,
                     parent: parentName,
+                    currentFolder,
                 }, getSettings());
                 await plugin.app.workspace.getLeaf().openFile(file);
             }, parentName).open();
@@ -79,12 +87,14 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
             if (!isKuwadateTask(meta)) return false;
             if (checking) return true;
 
+            const currentFolder = getFolderOf(plugin.app);
             const currentParent = resolveParentFromMeta(meta);
             new NewTaskModal(plugin.app, async (result) => {
                 // 1. Create the new parent with the current note's parent
                 const newParentFile = await createTask(plugin.app, {
                     name: result.name,
                     parent: currentParent,
+                    currentFolder,
                 }, getSettings());
 
                 // 2. Set the current note's parent to the new parent
