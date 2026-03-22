@@ -1,0 +1,88 @@
+/* Kuwadate tree view */
+.kuwadate-tree {
+    font-size: var(--nav-item-size);
+}
+
+.kuwadate-tree-item {
+    line-height: 1.6;
+}
+
+.kuwadate-tree-row {
+    display: flex;
+    align-items: center;
+    cursor: default;
+}
+
+.kuwadate-tree-toggle {
+    cursor: pointer;
+    user-select: none;
+    width: 1.2em;
+    display: inline-block;
+    font-size: 0.8em;
+}
+
+.kuwadate-tree-spacer {
+    width: 1.2em;
+    display: inline-block;
+}
+
+.kuwadate-status-icon {
+    margin-right: 0.3em;
+}
+
+.kuwadate-tree-link {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.kuwadate-tree-link:hover {
+    text-decoration: underline;
+}
+
+.kuwadate-tree-empty {
+    color: var(--text-muted);
+    padding: 8px;
+    font-style: italic;
+}
+
+/* Status colors */
+.kuwadate-status-todo {
+    color: var(--text-normal);
+}
+
+.kuwadate-status-done {
+    color: var(--text-success);
+}
+
+.kuwadate-status-in-progress {
+    color: var(--text-accent);
+}
+
+.kuwadate-status-blocked {
+    color: var(--text-error);
+}
+
+.kuwadate-status-waiting {
+    color: var(--text-warning);
+}
+
+.kuwadate-status-cancelled {
+    color: var(--text-muted);
+}
+
+/* Progress */
+.kuwadate-progress {
+    padding: 4px 0;
+}
+
+.kuwadate-progress-label {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.kuwadate-progress-empty {
+    color: var(--text-muted);
+    font-style: italic;
+}

@@ -1,0 +1,9 @@
+{
+	"id": "obsidian-kuwadate",
+	"name": "Kuwadate",
+	"version": "0.1.0",
+	"minAppVersion": "0.15.0",
+	"description": "Task and project management system for Obsidian",
+	"author": "Bob Myers",
+	"isDesktopOnly": false
+}
