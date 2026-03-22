@@ -3,6 +3,7 @@ import { registerCommands } from './src/commands';
 import { TREE_VIEW_TYPE, KuwadateTreeView } from './src/views/treeView';
 import { registerDescendantTreeProcessor } from './src/views/descendantTree';
 import { registerProgressProcessor } from './src/automation/progress';
+import { registerMermaidGraphProcessor } from './src/views/mermaidGraph';
 import { checkAndUpdateBlockStatus, propagateCompletion } from './src/automation/blockDetection';
 import { computeEndDate, rollupParentDates } from './src/automation/dateRollup';
 import { isKuwadateTask } from './src/taskGraph';
@@ -26,6 +27,15 @@ export default class KuwadatePlugin extends Plugin {
 
         // Register tree sidebar view
         this.registerView(TREE_VIEW_TYPE, (leaf) => new KuwadateTreeView(leaf));
+        this.addRibbonIcon('japanese-yen', 'Kuwadate task tree', () => {
+            this.activateTreeView();
+        }).querySelector('svg')?.replaceWith((() => {
+            const el = document.createElement('span');
+            el.textContent = '企';
+            el.style.fontSize = '18px';
+            el.style.lineHeight = '1';
+            return el;
+        })());
         this.addCommand({
             id: 'open-tree-view',
             name: 'Open task tree',
@@ -35,6 +45,7 @@ export default class KuwadatePlugin extends Plugin {
         // Register code block processors
         registerDescendantTreeProcessor(this);
         registerProgressProcessor(this);
+        registerMermaidGraphProcessor(this);
 
         // Auto-block detection on file open
         this.registerEvent(

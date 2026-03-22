@@ -15,9 +15,12 @@ export interface TaskNode {
 }
 
 /** Check if a file is a kuwadate task by looking for the kuwadate property. */
-export function isKuwadateTask(meta: CachedMetadata | null): boolean {
+export function isKuwadateTask(meta: CachedMetadata | null, file?: { path: string }): boolean {
     if (!meta?.frontmatter) return false;
-    return meta.frontmatter.kuwadate != null;
+    if (meta.frontmatter.kuwadate == null) return false;
+    // Exclude template files
+    if (file && file.path.includes('Template')) return false;
+    return true;
 }
 
 /** Extract the display name from a wikilink value like "[[Some Page]]" or "Some Page". */
@@ -59,7 +62,7 @@ export function buildTaskGraph(app: App): Map<string, TaskNode> {
 
     for (const file of app.vault.getMarkdownFiles()) {
         const meta = app.metadataCache.getFileCache(file);
-        if (!meta || !isKuwadateTask(meta)) continue;
+        if (!meta || !isKuwadateTask(meta, file)) continue;
         nodes.set(file.basename, buildTaskNode(file, meta));
     }
 

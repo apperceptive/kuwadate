@@ -226,7 +226,6 @@ views:
 `;
 
 const TASK_TEMPLATE_CONTENT = `---
-kuwadate: 1
 type: task
 status: todo
 priority:

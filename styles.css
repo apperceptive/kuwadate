@@ -86,3 +86,24 @@
     color: var(--text-muted);
     font-style: italic;
 }
+
+/* Mermaid graph */
+.block-language-kuwadate-graph .node .nodeLabel {
+    font-size: 0.75em;
+    padding: 0;
+}
+
+.block-language-kuwadate-graph .node .label {
+    margin: 0;
+    padding: 2px 6px;
+}
+
+.block-language-kuwadate-graph .node rect,
+.block-language-kuwadate-graph .node polygon {
+    rx: 3;
+    ry: 3;
+}
+
+.block-language-kuwadate-graph .edgeLabel {
+    font-size: 0.65em;
+}
