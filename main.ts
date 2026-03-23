@@ -75,7 +75,7 @@ export default class KuwadatePlugin extends Plugin {
                         await this.autoFillKuwadateNote(file, fm);
 
                         // If task was just marked done, propagate to dependents
-                        if (fm.status === 'done') {
+                        if (fm['kd-status'] === 'done') {
                             await propagateCompletion(this.app, file);
                         }
 
@@ -109,14 +109,14 @@ export default class KuwadatePlugin extends Plugin {
         let needsUpdate = false;
 
         // Check if parent is raw text (not a wikilink) and convert it
-        const parentVal = fm.parent;
+        const parentVal = fm['kd-parent'];
         const hasRawParent = parentVal && typeof parentVal === 'string'
             && !String(parentVal).startsWith('[[');
 
         // Check if essential fields are missing
-        const missingStatus = fm.status === undefined || fm.status === null;
-        const missingType = fm.type === undefined || fm.type === null;
-        const missingCreated = fm.created === undefined || fm.created === null;
+        const missingStatus = fm['kd-status'] === undefined || fm['kd-status'] === null;
+        const missingType = fm['kd-type'] === undefined || fm['kd-type'] === null;
+        const missingCreated = fm['kd-created'] === undefined || fm['kd-created'] === null;
 
         if (hasRawParent || missingStatus || missingType || missingCreated) {
             needsUpdate = true;
@@ -126,16 +126,16 @@ export default class KuwadatePlugin extends Plugin {
 
         await this.app.fileManager.processFrontMatter(file, (fmData) => {
             // Convert raw parent text to wikilink
-            if (fmData.parent && typeof fmData.parent === 'string'
-                && !fmData.parent.startsWith('[[')) {
-                fmData.parent = `[[${fmData.parent}]]`;
+            if (fmData['kd-parent'] && typeof fmData['kd-parent'] === 'string'
+                && !fmData['kd-parent'].startsWith('[[')) {
+                fmData['kd-parent'] = `[[${fmData['kd-parent']}]]`;
             }
 
             // Fill in missing standard fields
-            if (fmData.status === undefined || fmData.status === null) fmData.status = 'todo';
-            if (fmData.type === undefined || fmData.type === null) fmData.type = 'task';
-            if (fmData.created === undefined || fmData.created === null) {
-                fmData.created = new Date().toISOString().slice(0, 10);
+            if (fmData['kd-status'] == null) fmData['kd-status'] = 'todo';
+            if (fmData['kd-type'] == null) fmData['kd-type'] = 'task';
+            if (fmData['kd-created'] == null) {
+                fmData['kd-created'] = new Date().toISOString().slice(0, 10);
             }
         });
 

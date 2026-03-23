@@ -44,14 +44,14 @@ export function buildTaskNode(file: TFile, meta: CachedMetadata): TaskNode {
     return {
         file,
         name: file.basename,
-        status: fm.status ?? 'todo',
-        priority: typeof fm.priority === 'number' ? fm.priority : null,
-        urgency: typeof fm.urgency === 'number' ? fm.urgency : null,
-        parent: resolveLink(fm.parent),
-        dependsOn: resolveLinkList(fm['depends-on']),
-        duration: fm.duration ?? null,
-        start: fm.start ?? null,
-        due: fm.due ?? null,
+        status: fm['kd-status'] ?? 'todo',
+        priority: typeof fm['kd-priority'] === 'number' ? fm['kd-priority'] : null,
+        urgency: typeof fm['kd-urgency'] === 'number' ? fm['kd-urgency'] : null,
+        parent: resolveLink(fm['kd-parent']),
+        dependsOn: resolveLinkList(fm['kd-depends-on']),
+        duration: fm['kd-duration'] ?? null,
+        start: fm['kd-start'] ?? null,
+        due: fm['kd-due'] ?? null,
         children: [],
     };
 }

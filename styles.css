@@ -59,6 +59,10 @@
     color: var(--text-accent);
 }
 
+.kuwadate-status-maintenance {
+    color: var(--text-faint);
+}
+
 .kuwadate-status-blocked {
     color: var(--text-error);
 }

@@ -111,6 +111,7 @@ export function registerMermaidGraphProcessor(plugin: Plugin) {
         lines.push('');
         lines.push('    classDef done fill:#a3be8c,stroke:#689d6a,color:#2e3440');
         lines.push('    classDef inprogress fill:#88c0d0,stroke:#5e81ac,color:#2e3440');
+        lines.push('    classDef maintenance fill:#b48ead,stroke:#9a7a9a,color:#2e3440');
         lines.push('    classDef blocked fill:#bf616a,stroke:#a54e56,color:#eceff4');
         lines.push('    classDef waiting fill:#ebcb8b,stroke:#d08770,color:#2e3440');
         lines.push('    classDef cancelled fill:#4c566a,stroke:#3b4252,color:#d8dee9');

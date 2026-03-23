@@ -64,6 +64,7 @@ function getStatusIcon(status: string): string {
     switch (status) {
         case 'done': return '✓';
         case 'in-progress': return '→';
+        case 'maintenance': return '⚙';
         case 'blocked': return '⊘';
         case 'waiting': return '⏳';
         case 'cancelled': return '✗';
