@@ -4,22 +4,22 @@ import { KuwadateSettings } from './settings';
 
 const TASK_TEMPLATE = `---
 kuwadate: 1
-kd-type: task
-kd-status: todo
-kd-priority:
-kd-urgency:
-kd-parent: PARENT_PLACEHOLDER
-kd-depends-on:
+kd_type: task
+kd_status: todo
+kd_priority:
+kd_urgency:
+kd_parent: PARENT_PLACEHOLDER
+kd_depends_on:
   -
-kd-duration:
-kd-start:
-kd-due:
-kd-owner:
-kd-collaborators:
+kd_duration:
+kd_start:
+kd_due:
+kd_owner:
+kd_collaborators:
   -
-kd-cover:
-kd-cost:
-kd-created: "DATE_PLACEHOLDER"
+kd_cover:
+kd_cost:
+kd_created: "DATE_PLACEHOLDER"
 ---
 
 ## Description
@@ -99,20 +99,20 @@ export async function adaptNote(app: App, file: TFile): Promise<void> {
 
     const kuwadateProperties = [
         'kuwadate: 1',
-        'kd-type: task',
-        'kd-status: todo',
-        'kd-priority:',
-        'kd-urgency:',
-        'kd-parent:',
-        'kd-depends-on:\n  -',
-        'kd-duration:',
-        'kd-start:',
-        'kd-due:',
-        'kd-owner:',
-        'kd-collaborators:\n  -',
-        'kd-cover:',
-        'kd-cost:',
-        `kd-created: "${today}"`,
+        'kd_type: task',
+        'kd_status: todo',
+        'kd_priority:',
+        'kd_urgency:',
+        'kd_parent:',
+        'kd_depends_on:\n  -',
+        'kd_duration:',
+        'kd_start:',
+        'kd_due:',
+        'kd_owner:',
+        'kd_collaborators:\n  -',
+        'kd_cover:',
+        'kd_cost:',
+        `kd_created: "${today}"`,
     ];
 
     let newContent: string;

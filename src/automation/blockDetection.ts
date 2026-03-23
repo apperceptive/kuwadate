@@ -2,7 +2,7 @@ import { App, TFile } from 'obsidian';
 import { buildTaskGraph, isKuwadateTask } from '../taskGraph';
 
 /**
- * Check if a task should be blocked based on its kd-depends-on links.
+ * Check if a task should be blocked based on its kd_depends_on links.
  * Called on file-open for kuwadate tasks.
  */
 export async function checkAndUpdateBlockStatus(app: App, file: TFile): Promise<void> {
@@ -10,7 +10,7 @@ export async function checkAndUpdateBlockStatus(app: App, file: TFile): Promise<
     if (!meta || !isKuwadateTask(meta)) return;
 
     const fm = meta.frontmatter!;
-    const status = fm['kd-status'];
+    const status = fm['kd_status'];
 
     // Don't touch done or cancelled tasks
     if (status === 'done' || status === 'cancelled') return;
@@ -26,9 +26,9 @@ export async function checkAndUpdateBlockStatus(app: App, file: TFile): Promise<
     });
 
     if (hasUnmetDependency && status !== 'blocked') {
-        await updateFrontmatterField(app, file, 'kd-status', 'blocked');
+        await updateFrontmatterField(app, file, 'kd_status', 'blocked');
     } else if (!hasUnmetDependency && status === 'blocked') {
-        await updateFrontmatterField(app, file, 'kd-status', 'todo');
+        await updateFrontmatterField(app, file, 'kd_status', 'todo');
     }
 }
 
@@ -50,7 +50,7 @@ export async function propagateCompletion(app: App, completedFile: TFile): Promi
         });
 
         if (allDone) {
-            await updateFrontmatterField(app, node.file, 'kd-status', 'todo');
+            await updateFrontmatterField(app, node.file, 'kd_status', 'todo');
         }
     }
 }

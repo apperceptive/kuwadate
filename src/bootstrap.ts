@@ -10,26 +10,26 @@ aliases:
 ---
 Kuwadate (企て) is a task and project management system in Obsidian.
 
-Each task is its own page with a \`kuwadate\` property and \`kd-\` prefixed properties for status, priority, urgency, dependencies, duration, and due date. Tasks form a hierarchy through the \`kd-parent\` property.
+Each task is its own page with a \`kuwadate\` property and \`kd_\` prefixed properties for status, priority, urgency, dependencies, duration, and due date. Tasks form a hierarchy through the \`kd_parent\` property.
 
 ## Properties
 
 | Property         | Type   | Values                                                      |
 | ---------------- | ------ | ----------------------------------------------------------- |
-| kd-status        | text   | todo, in-progress, maintenance, blocked, waiting, done, cancelled |
-| kd-priority      | number | 1–4 (1 = highest)                                           |
-| kd-urgency       | number | 1–4 (1 = most urgent)                                       |
-| kd-parent        | link   | Wikilink to parent task page                                |
-| kd-depends-on    | list   | Wikilinks to blocking task pages                            |
-| kd-duration      | text   | Bases duration format: 2w, 3d, 4h, 30m                      |
-| kd-start         | date   | YYYY-MM-DD                                                  |
-| kd-due           | date   | YYYY-MM-DD                                                  |
-| kd-owner         | link   | Wikilink to person responsible                              |
-| kd-collaborators | list   | Wikilinks to people/resources involved                      |
-| kd-cover         | link   | Wikilink to image file for cards view                       |
-| kd-cost          | number | Cost                                                        |
-| kd-created       | date   | YYYY-MM-DD                                                  |
-| kd-closed-reason | text   | done, cancelled, etc.                                       |
+| kd_status        | text   | todo, in-progress, maintenance, blocked, waiting, done, cancelled |
+| kd_priority      | number | 1–4 (1 = highest)                                           |
+| kd_urgency       | number | 1–4 (1 = most urgent)                                       |
+| kd_parent        | link   | Wikilink to parent task page                                |
+| kd_depends_on    | list   | Wikilinks to blocking task pages                            |
+| kd_duration      | text   | Bases duration format: 2w, 3d, 4h, 30m                      |
+| kd_start         | date   | YYYY-MM-DD                                                  |
+| kd_due           | date   | YYYY-MM-DD                                                  |
+| kd_owner         | link   | Wikilink to person responsible                              |
+| kd_collaborators | list   | Wikilinks to people/resources involved                      |
+| kd_cover         | link   | Wikilink to image file for cards view                       |
+| kd_cost          | number | Cost                                                        |
+| kd_created       | date   | YYYY-MM-DD                                                  |
+| kd_closed_reason | text   | done, cancelled, etc.                                       |
 
 ## All Tasks
 ![[Kuwadate.base#All Tasks]]
@@ -48,69 +48,69 @@ const BASE_FILE = `filters:
   and:
     - note.kuwadate == 1
 properties:
-  kd-status:
+  kd_status:
     displayName: Status
-  kd-priority:
+  kd_priority:
     displayName: Pri
-  kd-urgency:
+  kd_urgency:
     displayName: Urg
-  kd-parent:
+  kd_parent:
     displayName: Parent
-  kd-depends-on:
+  kd_depends_on:
     displayName: Depends On
-  kd-duration:
+  kd_duration:
     displayName: Duration
-  kd-due:
+  kd_due:
     displayName: Due
-  kd-owner:
+  kd_owner:
     displayName: Owner
-  kd-collaborators:
+  kd_collaborators:
     displayName: Collaborators
 views:
   - type: table
     name: All Tasks
     order:
       - file.name
-      - kd-status
-      - kd-priority
-      - kd-urgency
-      - kd-due
+      - kd_status
+      - kd_priority
+      - kd_urgency
+      - kd_due
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
-      - property: kd-urgency
+      - property: kd_urgency
         direction: ASC
   - type: table
     name: Ancestors
     filters:
       and:
         - or:
-            - file == this.kd-parent
-            - file == this.kd-parent.asFile().properties.kd-parent
-            - file == this.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent
-            - file == this.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent
-            - file == this.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent
+            - file == this.kd_parent
+            - file == this.kd_parent.asFile().properties.kd_parent
+            - file == this.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent
+            - file == this.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent
+            - file == this.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent
     order:
       - file.name
-      - kd-status
-      - kd-priority
-      - kd-urgency
+      - kd_status
+      - kd_priority
+      - kd_urgency
   - type: table
     name: Sisters
     filters:
       and:
-        - kd-parent == this.kd-parent
+        - kd_parent == this.kd_parent
         - file != this.file
     order:
       - file.name
-      - kd-status
-      - kd-priority
-      - kd-urgency
-      - kd-due
+      - kd_status
+      - kd_priority
+      - kd_urgency
+      - kd_due
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
-      - property: kd-urgency
+      - property: kd_urgency
         direction: ASC
 `;
 
@@ -118,23 +118,23 @@ const DESCENDANTS_BASE_FILE = `filters:
   and:
     - note.kuwadate == 1
     - or:
-        - kd-parent == this.file.name
-        - kd-parent.asFile().properties.kd-parent == this.file.name
-        - kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent == this.file.name
-        - kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent == this.file.name
-        - kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent.asFile().properties.kd-parent == this.file.name
+        - kd_parent == this.file.name
+        - kd_parent.asFile().properties.kd_parent == this.file.name
+        - kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent == this.file.name
+        - kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent == this.file.name
+        - kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent.asFile().properties.kd_parent == this.file.name
 properties:
-  kd-status:
+  kd_status:
     displayName: Status
-  kd-priority:
+  kd_priority:
     displayName: Pri
-  kd-urgency:
+  kd_urgency:
     displayName: Urg
-  kd-parent:
+  kd_parent:
     displayName: Parent
-  kd-due:
+  kd_due:
     displayName: Due
-  kd-cost:
+  kd_cost:
     displayName: Cost
 views:
   - type: table
@@ -142,114 +142,114 @@ views:
     filters:
       and:
         - note.kuwadate == 1
-        - kd-parent == this.file.name
+        - kd_parent == this.file.name
     order:
       - file.name
-      - kd-status
-      - kd-urgency
-      - kd-priority
-      - kd-due
-      - kd-cost
+      - kd_status
+      - kd_urgency
+      - kd_priority
+      - kd_due
+      - kd_cost
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
-      - property: kd-urgency
+      - property: kd_urgency
         direction: ASC
-      - property: kd-status
+      - property: kd_status
         direction: ASC
     summary:
-      kd-cost: sum
+      kd_cost: sum
   - type: cards
     name: Children Cards
     filters:
       and:
-        - kd-parent == this.file.name
+        - kd_parent == this.file.name
     order:
       - file.name
-      - kd-status
-      - kd-priority
-      - kd-urgency
+      - kd_status
+      - kd_priority
+      - kd_urgency
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
-      - property: kd-urgency
+      - property: kd_urgency
         direction: ASC
-    image: kd-cover
+    image: kd_cover
   - type: table
     name: All Descendants
     order:
       - file.name
-      - kd-status
-      - kd-priority
-      - kd-urgency
-      - kd-due
-      - kd-cost
+      - kd_status
+      - kd_priority
+      - kd_urgency
+      - kd_due
+      - kd_cost
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
-      - property: kd-urgency
+      - property: kd_urgency
         direction: ASC
     summary:
-      kd-cost: sum
+      kd_cost: sum
   - type: table
     name: Active
     filters:
       and:
         - or:
-            - note.kd-status == "in-progress"
-            - note.kd-status == "maintenance"
+            - note.kd_status == "in-progress"
+            - note.kd_status == "maintenance"
     order:
       - file.name
-      - kd-priority
-      - kd-urgency
-      - kd-due
+      - kd_priority
+      - kd_urgency
+      - kd_due
     sort:
-      - property: kd-priority
+      - property: kd_priority
         direction: ASC
   - type: table
     name: Blocked
     filters:
       and:
-        - note.kd-status == "blocked"
+        - note.kd_status == "blocked"
     order:
       - file.name
-      - kd-priority
-      - kd-urgency
-      - kd-due
+      - kd_priority
+      - kd_urgency
+      - kd_due
   - type: table
     name: Due Soon
     filters:
       and:
-        - note.kd-status != "done"
-        - note.kd-status != "cancelled"
-        - note.kd-due <= today() + "7d"
+        - note.kd_status != "done"
+        - note.kd_status != "cancelled"
+        - note.kd_due <= today() + "7d"
     order:
       - file.name
-      - kd-status
-      - kd-due
-      - kd-priority
+      - kd_status
+      - kd_due
+      - kd_priority
     sort:
-      - property: kd-due
+      - property: kd_due
         direction: ASC
 `;
 
 const TASK_TEMPLATE_CONTENT = `---
-kd-type: task
-kd-status: todo
-kd-priority:
-kd-urgency:
-kd-parent:
-kd-depends-on:
+kd_type: task
+kd_status: todo
+kd_priority:
+kd_urgency:
+kd_parent:
+kd_depends_on:
   -
-kd-duration:
-kd-start:
-kd-due:
-kd-owner:
-kd-collaborators:
+kd_duration:
+kd_start:
+kd_due:
+kd_owner:
+kd_collaborators:
   -
-kd-cover:
-kd-cost:
-kd-created: "{{date:YYYY-MM-DD}}"
+kd_cover:
+kd_cost:
+kd_created: "{{date:YYYY-MM-DD}}"
 ---
 
 ## Description

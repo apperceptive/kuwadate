@@ -15,30 +15,30 @@ function parseDuration(duration: string): number | null {
     }
 }
 
-/** Compute kd-due = kd-start + kd-duration and update if needed. */
+/** Compute kd_due = kd_start + kd_duration and update if needed. */
 export async function computeEndDate(app: App, file: TFile): Promise<void> {
     const meta = app.metadataCache.getFileCache(file);
     if (!meta || !isKuwadateTask(meta)) return;
 
     const fm = meta.frontmatter!;
-    if (!fm['kd-start'] || !fm['kd-duration']) return;
+    if (!fm['kd_start'] || !fm['kd_duration']) return;
 
-    const startMs = new Date(fm['kd-start']).getTime();
+    const startMs = new Date(fm['kd_start']).getTime();
     if (isNaN(startMs)) return;
 
-    const durationMs = parseDuration(String(fm['kd-duration']));
+    const durationMs = parseDuration(String(fm['kd_duration']));
     if (!durationMs) return;
 
     const computedDue = new Date(startMs + durationMs).toISOString().slice(0, 10);
 
-    if (fm['kd-due'] !== computedDue) {
+    if (fm['kd_due'] !== computedDue) {
         await app.fileManager.processFrontMatter(file, (fmData) => {
-            fmData['kd-due'] = computedDue;
+            fmData['kd_due'] = computedDue;
         });
     }
 }
 
-/** Update a parent's kd-start/kd-due based on its children's dates. */
+/** Update a parent's kd_start/kd_due based on its children's dates. */
 export async function rollupParentDates(app: App, file: TFile): Promise<void> {
     const meta = app.metadataCache.getFileCache(file);
     if (!meta || !isKuwadateTask(meta)) return;
@@ -61,13 +61,13 @@ export async function rollupParentDates(app: App, file: TFile): Promise<void> {
 
     const fm = meta.frontmatter!;
     const needsUpdate =
-        (earliestStart && fm['kd-start'] !== earliestStart) ||
-        (latestDue && fm['kd-due'] !== latestDue);
+        (earliestStart && fm['kd_start'] !== earliestStart) ||
+        (latestDue && fm['kd_due'] !== latestDue);
 
     if (needsUpdate) {
         await app.fileManager.processFrontMatter(file, (fmData) => {
-            if (earliestStart) fmData['kd-start'] = earliestStart;
-            if (latestDue) fmData['kd-due'] = latestDue;
+            if (earliestStart) fmData['kd_start'] = earliestStart;
+            if (latestDue) fmData['kd_due'] = latestDue;
         });
     }
 }

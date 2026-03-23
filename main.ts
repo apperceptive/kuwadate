@@ -20,7 +20,10 @@ export default class KuwadatePlugin extends Plugin {
         this.addSettingTab(new KuwadateSettingTab(this.app, this));
 
         // Bootstrap system files on first run
-        this.app.workspace.onLayoutReady(() => bootstrapKuwadate(this.app));
+        this.app.workspace.onLayoutReady(() => {
+            bootstrapKuwadate(this.app);
+            this.registerPropertyTypes();
+        });
 
         // Register commands
         registerCommands(this, () => this.settings);
@@ -75,7 +78,7 @@ export default class KuwadatePlugin extends Plugin {
                         await this.autoFillKuwadateNote(file, fm);
 
                         // If task was just marked done, propagate to dependents
-                        if (fm['kd-status'] === 'done') {
+                        if (fm['kd_status'] === 'done') {
                             await propagateCompletion(this.app, file);
                         }
 
@@ -96,6 +99,35 @@ export default class KuwadatePlugin extends Plugin {
         this.app.workspace.detachLeavesOfType(TREE_VIEW_TYPE);
     }
 
+    /** Register property types and display names for all kd_ properties. */
+    private registerPropertyTypes() {
+        // @ts-ignore - metadataTypeManager is not in the public API typings
+        const mtm = this.app.metadataTypeManager;
+        if (!mtm?.setType) return;
+
+        const propertyTypes: Record<string, string> = {
+            'kd_status':        'text',
+            'kd_type':          'text',
+            'kd_priority':      'number',
+            'kd_urgency':       'number',
+            'kd_parent':        'text',
+            'kd_depends_on':    'multitext',
+            'kd_duration':      'text',
+            'kd_start':         'date',
+            'kd_due':           'date',
+            'kd_owner':         'text',
+            'kd_collaborators': 'multitext',
+            'kd_cover':         'text',
+            'kd_cost':          'number',
+            'kd_created':       'date',
+            'kd_closed_reason': 'text',
+        };
+
+        for (const [key, type] of Object.entries(propertyTypes)) {
+            mtm.setType(key, type);
+        }
+    }
+
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     }
@@ -109,14 +141,14 @@ export default class KuwadatePlugin extends Plugin {
         let needsUpdate = false;
 
         // Check if parent is raw text (not a wikilink) and convert it
-        const parentVal = fm['kd-parent'];
+        const parentVal = fm['kd_parent'];
         const hasRawParent = parentVal && typeof parentVal === 'string'
             && !String(parentVal).startsWith('[[');
 
         // Check if essential fields are missing
-        const missingStatus = fm['kd-status'] === undefined || fm['kd-status'] === null;
-        const missingType = fm['kd-type'] === undefined || fm['kd-type'] === null;
-        const missingCreated = fm['kd-created'] === undefined || fm['kd-created'] === null;
+        const missingStatus = fm['kd_status'] === undefined || fm['kd_status'] === null;
+        const missingType = fm['kd_type'] === undefined || fm['kd_type'] === null;
+        const missingCreated = fm['kd_created'] === undefined || fm['kd_created'] === null;
 
         if (hasRawParent || missingStatus || missingType || missingCreated) {
             needsUpdate = true;
@@ -126,16 +158,16 @@ export default class KuwadatePlugin extends Plugin {
 
         await this.app.fileManager.processFrontMatter(file, (fmData) => {
             // Convert raw parent text to wikilink
-            if (fmData['kd-parent'] && typeof fmData['kd-parent'] === 'string'
-                && !fmData['kd-parent'].startsWith('[[')) {
-                fmData['kd-parent'] = `[[${fmData['kd-parent']}]]`;
+            if (fmData['kd_parent'] && typeof fmData['kd_parent'] === 'string'
+                && !fmData['kd_parent'].startsWith('[[')) {
+                fmData['kd_parent'] = `[[${fmData['kd_parent']}]]`;
             }
 
             // Fill in missing standard fields
-            if (fmData['kd-status'] == null) fmData['kd-status'] = 'todo';
-            if (fmData['kd-type'] == null) fmData['kd-type'] = 'task';
-            if (fmData['kd-created'] == null) {
-                fmData['kd-created'] = new Date().toISOString().slice(0, 10);
+            if (fmData['kd_status'] == null) fmData['kd_status'] = 'todo';
+            if (fmData['kd_type'] == null) fmData['kd_type'] = 'task';
+            if (fmData['kd_created'] == null) {
+                fmData['kd_created'] = new Date().toISOString().slice(0, 10);
             }
         });
 

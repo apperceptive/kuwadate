@@ -99,7 +99,7 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
 
                 // 2. Set the current note's parent to the new parent
                 await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
-                    fm['kd-parent'] = `[[${result.name}]]`;
+                    fm['kd_parent'] = `[[${result.name}]]`;
                 });
 
                 await plugin.app.workspace.getLeaf().openFile(newParentFile);
@@ -129,7 +129,7 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
                 // Reparent all of the parent's children to the grandparent
                 for (const child of parentNode.children) {
                     await plugin.app.fileManager.processFrontMatter(child.file, (fm) => {
-                        fm['kd-parent'] = grandparent ? `[[${grandparent}]]` : '';
+                        fm['kd_parent'] = grandparent ? `[[${grandparent}]]` : '';
                     });
                 }
 
@@ -141,8 +141,8 @@ export function registerCommands(plugin: Plugin, getSettings: () => KuwadateSett
 }
 
 function resolveParentFromMeta(meta: import('obsidian').CachedMetadata | null): string | null {
-    if (!meta?.frontmatter?.['kd-parent']) return null;
-    const val = String(meta.frontmatter['kd-parent']);
+    if (!meta?.frontmatter?.['kd_parent']) return null;
+    const val = String(meta.frontmatter['kd_parent']);
     const match = val.match(/^\[\[(.+?)(?:\|.+?)?\]\]$/);
     return match ? match[1] : val;
 }
