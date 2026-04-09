@@ -315,7 +315,38 @@ ${desc}
 ![[Kuwadate.base#Ancestors]]
 `;
 
-        const path = `${KD_FOLDER}/${name}.md`;
+        // Resolve folder based on plugin settings, matching the plugin's getTaskFolder logic
+        const settingsCode = `
+            (() => {
+                const plugin = app.plugins.plugins['obsidian-kuwadate'];
+                if (!plugin || !plugin.settings) return JSON.stringify({ taskFolder: 'current', customFolder: '' });
+                return JSON.stringify({ taskFolder: plugin.settings.taskFolder, customFolder: plugin.settings.customFolder });
+            })()
+        `;
+        const { taskFolder, customFolder } = JSON.parse(await cli.evaluate(settingsCode));
+
+        let folder: string;
+        if (taskFolder === 'kuwadate') {
+            folder = KD_FOLDER;
+        } else if (taskFolder === 'custom') {
+            folder = customFolder ?? '';
+        } else if (parent) {
+            // 'current' setting: use the parent task's folder for subtasks
+            const parentCode = `
+                (() => {
+                    const file = app.vault.getMarkdownFiles().find(f => f.basename === ${JSON.stringify(parent)});
+                    if (!file) return '';
+                    const parts = file.path.split('/');
+                    parts.pop();
+                    return parts.join('/');
+                })()
+            `;
+            folder = await cli.evaluate(parentCode) ?? KD_FOLDER;
+        } else {
+            folder = KD_FOLDER;
+        }
+
+        const path = folder ? `${folder}/${name}.md` : `${name}.md`;
         await cli.writeFile(path, content);
         return text(`Created task: ${name}\nPath: ${path}`);
     }
