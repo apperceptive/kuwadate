@@ -179,6 +179,24 @@ class KuwadateMCPServer {
                         required: ['name'],
                     },
                 },
+                {
+                    name: 'kuwadate_adapt_task',
+                    description: 'Adapt an existing note into a kuwadate task. Adds kuwadate frontmatter properties while preserving existing content and frontmatter.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                                description: 'The note name (filename without .md) to adapt into a kuwadate task',
+                            },
+                            parent: {
+                                type: 'string',
+                                description: 'Parent task name (optional)',
+                            },
+                        },
+                        required: ['name'],
+                    },
+                },
             ],
         }));
 
@@ -193,6 +211,7 @@ class KuwadateMCPServer {
                     case 'kuwadate_get_tree': return await this.getTree(args);
                     case 'kuwadate_move_task': return await this.moveTask(args);
                     case 'kuwadate_complete_task': return await this.completeTask(args);
+                    case 'kuwadate_adapt_task': return await this.adaptTask(args);
                     default: return errorResult(`Unknown tool: ${name}`);
                 }
             } catch (err: any) {
@@ -481,6 +500,62 @@ ${desc}
         `;
         const result = await cli.evaluate(code);
         return text(result);
+    }
+
+    private async adaptTask(args: any) {
+        const { name, parent } = args;
+        const today = new Date().toISOString().slice(0, 10);
+        const parentValue = parent ? `[[${parent}]]` : '';
+
+        const code = `
+            (async () => {
+                const file = app.vault.getMarkdownFiles().find(f => f.basename === ${JSON.stringify(name)});
+                if (!file) return JSON.stringify({ error: 'Note not found' });
+                const meta = app.metadataCache.getFileCache(file);
+                if (meta?.frontmatter?.kuwadate) return JSON.stringify({ error: 'Note is already a kuwadate task' });
+                return JSON.stringify({ path: file.path });
+            })()
+        `;
+        const result = JSON.parse(await cli.evaluate(code));
+        if (result.error) return errorResult(result.error);
+
+        // Read the existing content
+        const content = await cli.readFile(result.path);
+
+        const kuwadateProperties: Record<string, string> = {
+            kuwadate: '1',
+            kd_type: 'task',
+            kd_status: 'todo',
+            kd_parent: parentValue,
+            kd_created: today,
+        };
+
+        // Use processFrontMatter to add properties while preserving existing frontmatter
+        const propsJson = JSON.stringify(kuwadateProperties);
+        const addPropsCode = `
+            (async () => {
+                const file = app.vault.getMarkdownFiles().find(f => f.basename === ${JSON.stringify(name)});
+                if (!file) return 'Error: Note not found';
+                const props = ${propsJson};
+                await app.fileManager.processFrontMatter(file, (fm) => {
+                    for (const [key, value] of Object.entries(props)) {
+                        if (!(key in fm)) fm[key] = value;
+                    }
+                });
+                return 'OK';
+            })()
+        `;
+        const addResult = await cli.evaluate(addPropsCode);
+        if (addResult !== 'OK') return errorResult(addResult);
+
+        // Append subtasks sections if not present
+        if (!content.includes('Kuwadate Descendants.base#Children')) {
+            const updated = await cli.readFile(result.path);
+            const appended = updated.trimEnd() + '\n\n## Subtasks\n![[Kuwadate Descendants.base#Children]]\n\n## Other Tasks\n![[Kuwadate.base#Ancestors]]\n';
+            await cli.writeFile(result.path, appended);
+        }
+
+        return text(`Adapted note "${name}" into a kuwadate task.\nPath: ${result.path}`);
     }
 
     async run() {

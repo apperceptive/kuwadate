@@ -118,9 +118,12 @@ export async function adaptNote(app: App, file: TFile): Promise<void> {
     let newContent: string;
     if (hasFrontmatter) {
         // Insert kuwadate properties into existing frontmatter
-        const endIdx = content.indexOf('---', 3);
+        const firstNewline = content.indexOf('\n');
+        if (firstNewline === -1) return;
+        const fmStart = firstNewline + 1;
+        const endIdx = content.indexOf('---', fmStart);
         if (endIdx === -1) return;
-        const existingFm = content.slice(4, endIdx);
+        const existingFm = content.slice(fmStart, endIdx);
         const rest = content.slice(endIdx + 3);
 
         // Only add properties not already present
