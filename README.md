@@ -90,6 +90,12 @@ The server runs on stdio. Configure it in your MCP client with:
 }
 ```
 
+On Windows, set `OBSIDIAN_CMD` to the console shim `Obsidian.com` (not `Obsidian.exe`, which is the GUI launcher and doesn't pipe stdout). The most robust form is an absolute path, which avoids PATH-inheritance surprises depending on how the MCP client is launched:
+
+```json
+"OBSIDIAN_CMD": "C:\\Program Files\\Obsidian\\Obsidian.com"
+```
+
 ## Development
 
 ```bash
