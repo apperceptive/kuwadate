@@ -58,9 +58,8 @@ export class KuwadateTreeView extends ItemView {
         }
     }
 
-    private renderNode(parentEl: HTMLElement, node: TaskNode, depth = 0) {
+    private renderNode(parentEl: HTMLElement, node: TaskNode) {
         const itemEl = parentEl.createEl('div', { cls: 'kuwadate-tree-item' });
-        itemEl.style.paddingLeft = `${depth * 16}px`;
 
         const rowEl = itemEl.createEl('div', { cls: `kuwadate-tree-row kuwadate-status-${node.status}` });
 
@@ -107,7 +106,7 @@ export class KuwadateTreeView extends ItemView {
             return a.name.localeCompare(b.name);
         });
         for (const child of sortedChildren) {
-            this.renderNode(childrenEl, child, depth + 1);
+            this.renderNode(childrenEl, child);
         }
     }
 }
