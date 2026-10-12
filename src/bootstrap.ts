@@ -137,8 +137,37 @@ properties:
   kd_cost:
     displayName: Cost
 views:
-  - type: table
+  - type: kanban
     name: Children
+    filters:
+      and:
+        - note.kuwadate == 1
+        - kd_parent == this.file.name
+    groupBy:
+      property: kd_status
+      direction: ASC
+    groupOrder:
+      - todo
+      - in-progress
+      - maintenance
+      - waiting
+      - blocked
+      - done
+      - cancelled
+    order:
+      - file.name
+      - kd_priority
+      - kd_urgency
+      - kd_due
+      - kd_cost
+    sort:
+      - property: kd_priority
+        direction: ASC
+      - property: kd_urgency
+        direction: ASC
+    image: kd_cover
+  - type: table
+    name: Children Table
     filters:
       and:
         - note.kuwadate == 1
